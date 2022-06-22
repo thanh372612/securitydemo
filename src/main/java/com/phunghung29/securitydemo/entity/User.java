@@ -22,6 +22,12 @@ public class User {
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "age")
+    private Integer age;
+    @Column(name = "gender")
+    private String gender;
+    @Column(name = "isActivated")
+    private Boolean isActivated;
     @ManyToOne(optional = false)
     @JoinColumn(name = "role_id", nullable = false)
     @ToString.Exclude

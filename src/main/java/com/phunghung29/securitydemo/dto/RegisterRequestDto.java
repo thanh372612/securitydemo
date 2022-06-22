@@ -12,6 +12,9 @@ import lombok.Setter;
 public class RegisterRequestDto {
     private String email;
     private String password;
+    private Integer age;
+    private String gender;
+    private Boolean isactivited = true;
     private Long role_id= 2L;
 
 }

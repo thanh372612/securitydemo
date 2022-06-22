@@ -3,6 +3,7 @@ package com.phunghung29.securitydemo.exception;
 public class CODE {
     public static String EMAIL_EXIST = "EMAIL_EXIST";
     public static String UPDATE_SUCESSFFULY="Update Role User Successfully";
+    public static String UPDATE_SUCESSFFULY_PASS="Update Pass User Successfully";
 
     public static String LOGIN_SUCESSFFULY="LOGIN_SUCESSFFULY";
 

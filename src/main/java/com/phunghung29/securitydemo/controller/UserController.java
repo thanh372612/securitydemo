@@ -1,9 +1,6 @@
 package com.phunghung29.securitydemo.controller;
 
-import com.phunghung29.securitydemo.dto.ChangePassRequetDto;
-import com.phunghung29.securitydemo.dto.ResponeObject;
-import com.phunghung29.securitydemo.dto.UserDto;
-import com.phunghung29.securitydemo.dto.UserUpdataDto;
+import com.phunghung29.securitydemo.dto.*;
 import com.phunghung29.securitydemo.exception.CODE;
 import com.phunghung29.securitydemo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +39,15 @@ public class UserController {
     public ResponseEntity<ResponeObject> changePassCustomer(@RequestBody ChangePassRequetDto changePassRequetDto, @PathVariable Long id){
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY, Instant.now(),userService.changePass(changePassRequetDto, id))
+                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY_PASS, Instant.now(),userService.changePass(changePassRequetDto, id))
+        );
+    }
+    @PostMapping("/search")
+    public ResponseEntity<ResponeObject> searchEmailUser(@RequestBody SearchEmaiRequestDto searchEmaiRequestDto)
+    {
+        List<UserDto> userDtoList = userService.searchEmail(searchEmaiRequestDto.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY_PASS, Instant.now(),userDtoList)
         );
     }
 

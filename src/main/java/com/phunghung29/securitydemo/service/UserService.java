@@ -19,7 +19,9 @@ public interface UserService {
     UserDto updateUser(UserUpdataDto userUpdataDto, Long id);
     ChangePassDto changePass(ChangePassRequetDto changePassRequetDto, Long id);
 
+    List<UserDto> searchEmail (String searchEmaiRequestDto);
 
+//    List<UserDto>
 
 //    ResponseEntity<ResponeObject> updateUser1(UserUpdataDto userUpdataDto, Long id);
 
