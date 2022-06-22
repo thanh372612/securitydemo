@@ -17,6 +17,11 @@ public interface UserService {
     List<UserDto> findAll();
 
     UserDto updateUser(UserUpdataDto userUpdataDto, Long id);
+    ChangePassDto changePass(ChangePassRequetDto changePassRequetDto, Long id);
+
+
+
+//    ResponseEntity<ResponeObject> updateUser1(UserUpdataDto userUpdataDto, Long id);
 
 
 }

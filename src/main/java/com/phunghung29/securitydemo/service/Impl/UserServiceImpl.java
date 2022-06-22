@@ -5,10 +5,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.phunghung29.securitydemo.dto.*;
 import com.phunghung29.securitydemo.entity.Role;
 import com.phunghung29.securitydemo.entity.User;
+import com.phunghung29.securitydemo.exception.CODE;
+import com.phunghung29.securitydemo.exception.NotFoundException;
 import com.phunghung29.securitydemo.repository.RoleRepository;
 import com.phunghung29.securitydemo.repository.UserRepository;
 import com.phunghung29.securitydemo.service.UserService;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -77,14 +81,14 @@ public class UserServiceImpl implements UserService {
         User foundUser= userRepository.findByEmail(registerRequestDto.getEmail().trim());
         if(foundUser != null){
             return  ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
-                    new ResponeObject("fail","User ton tai", "")
+                    new ResponeObject("fail","User ton tai",Instant.now(), "")
             );
         }
         Role role =roleRepository.findById(registerRequestDto.getRole_id()).orElse(null);
         if (role ==null)
         {
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponeObject("fail","User error", "")
+                    new ResponeObject("fail","User error", Instant.now(), "")
             );
         }
         User user= new User();
@@ -93,7 +97,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodePassword);
         user.setRole(role);
         return  ResponseEntity.status(HttpStatus.OK).body(
-                new ResponeObject("ok","User Successfully", userRepository.save(user))
+                new ResponeObject("ok","User Successfully",Instant.now(),userRepository.save(user))
         );
     }
 
@@ -102,12 +106,19 @@ public class UserServiceImpl implements UserService {
         User foundUser= userRepository.findByEmail(registerRequestDto.getEmail().trim());
         if(foundUser != null)
         {
-            return new RegisterDto("Email tồn  tại", "") ;
+//            return new RegisterDto("Email tồn  tại", "") ;
+//            return  ResponseEntity.status(HttpStatus.OK).body(
+//                    new ResponeObject("400","Email", Instant.now(),throw  new NotFoundException(CODE.EMAIL_NOT_FOUND, "Email not found"))
+//            );
+            throw  new NotFoundException(CODE.EMAIL_EXIST, "Email exist");
+
         }
+
         Role role =roleRepository.findById(registerRequestDto.getRole_id()).orElse(null);
         if (role ==null)
         {
-            return new RegisterDto("Role không tồn tại", "") ;
+//            return new RegisterDto("Role không tồn tại", "") ;
+            throw  new NotFoundException(CODE.ROLE_NULL, "Role null");
         }
 
         User user= new User();
@@ -117,29 +128,29 @@ public class UserServiceImpl implements UserService {
         String testPass= registerRequestDto.getPassword();
         if(testPass== null || testPass.isEmpty())
         {
-            return new RegisterDto("Password không để trống","");
+//            return new RegisterDto("Password không để trống","");
+            throw  new NotFoundException(CODE.PASS_NOT_NULL, "Password not null");
         }
         if(testPass.length() < 8 || testPass.length() > 16)
         {
-            return new RegisterDto("Password này không đáp ứng chiều dài","");
+//            return new RegisterDto("Password này không đáp ứng chiều dài","");
+
+            throw  new NotFoundException(CODE.PASS_NOT_LENGTH, "Password not length");
         }
         if(!testPass.matches(".*(?=.*[@#$%]).*"))
         {
-            return new RegisterDto("Password phải chứa các kí tự  @ # $ %","");
+//            return new RegisterDto("Password phải chứa các kí tự  @ # $ %","");
+            throw  new NotFoundException(CODE.PASS_KY_ITSELF, "The password must contain characters @ # $ %");
         }
         String testEmail= registerRequestDto.getEmail();
         String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
                 + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         if(!Pattern.matches(regexPattern, testEmail))
         {
-            return new RegisterDto("Định dạng email không đúng (vd: john@doe.com)","");
+//            return new RegisterDto("Định dạng email không đúng (vd: john@doe.com)","");
+            throw  new NotFoundException(CODE.EMAIL_NOT_FORMAT, "Email not format");
         }
-//        else {
-//            if (testPass.length()>8 && testPass.matches("/^[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$/"))
-//            {
-//                return new RegisterDto("Password phải dài hơn 8 và phải có ký tự đặc biệt","");
-//            }
-//        }
+
         String encodePassword= passwordEncoder.encode(registerRequestDto.getPassword());
         user.setPassword(encodePassword);
         user.setRole(role);
@@ -187,6 +198,48 @@ public class UserServiceImpl implements UserService {
                      return userDto.get();
                 });
         return userDto.get();
+    }
+
+    @Override
+    public ChangePassDto changePass(ChangePassRequetDto changePassRequetDto, Long id) {
+        AtomicReference<ChangePassDto> changePassDto = new AtomicReference<>(new ChangePassDto());
+        userRepository.findById(id)
+                .map(user->{
+                    String email= changePassRequetDto.getEmail();
+                    if(email == null || email.isEmpty())
+                    {
+                        throw new NotFoundException(CODE.EMAIL_NOT_NULL, "Email not null");
+                    }
+                    User getEmail= userRepository.findById(changePassRequetDto.getId()).orElse(null);
+//                    User getEmail1= userRepository.findByEmail(email);
+                    if(!getEmail.getEmail().equals(email))
+                    {
+                        throw new NotFoundException(CODE.EMAIL_INCORRECT, "Email incorrect");
+                    }
+//                    String getPass= changePassRequetDto.getPass_ord();
+                    Boolean encodePasswordOld= passwordEncoder.matches(changePassRequetDto.getPass_ord() ,getEmail.getPassword());
+
+                    if(!encodePasswordOld)
+                    {
+                        throw new NotFoundException(CODE.PASS_ERROR, "Password error");
+                    }
+                    String encodePassword= passwordEncoder.encode(changePassRequetDto.getPass_new());
+
+                    user.setPassword(encodePassword);
+
+                    userRepository.save(user);
+                    changePassDto.set(new ChangePassDto(id, user.getEmail(), user.getRole().getRoleName()));
+
+                    return changePassDto.get();
+                }).orElseGet(()->{
+                    User user1= new User();
+                    user1.setId(id);
+                    user1.setEmail(changePassRequetDto.getEmail());
+                    changePassDto.set(new ChangePassDto(id, user1.getEmail(), user1.getRole().getRoleName()));
+                    userRepository.save(user1);
+                    return changePassDto.get();
+                });
+        return changePassDto.get();
     }
 
 
