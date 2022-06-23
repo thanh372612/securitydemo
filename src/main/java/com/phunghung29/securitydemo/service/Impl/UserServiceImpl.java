@@ -10,6 +10,7 @@ import com.phunghung29.securitydemo.exception.NotFoundException;
 import com.phunghung29.securitydemo.repository.RoleRepository;
 import com.phunghung29.securitydemo.repository.UserRepository;
 import com.phunghung29.securitydemo.service.UserService;
+import com.phunghung29.securitydemo.specs.UserSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -57,18 +58,24 @@ public class UserServiceImpl implements UserService {
     public LoginDto login(LoginRequestDto loginRequestDto) throws RuntimeException {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
+
         try {
             if (authenticate(email, password)) {
                 UserDetails userDetails = userDetailService.loadUserByUsername(email);
                 User detectedUser = userRepository.findByEmail(email);
-                Map<String, Object> payload = new HashMap<>();
-                payload.put("id", detectedUser.getId());
-                payload.put("email", detectedUser.getEmail());
-                payload.put("role", detectedUser.getRole().getRoleName());
-                String token = generateToken(payload, new org.springframework.security.core.userdetails.User(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities()));
-                return new LoginDto(token);
+                if(detectedUser.getIsActivated() == true) {
+                    Map<String, Object> payload = new HashMap<>();
+                    payload.put("id", detectedUser.getId());
+                    payload.put("email", detectedUser.getEmail());
+                    payload.put("role", detectedUser.getRole().getRoleName());
+                    String token = generateToken(payload, new org.springframework.security.core.userdetails.User(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities()));
+                    return new LoginDto(token);
+                }
+                else {
+                    return new LoginDto("Tài khoản bị khóa");
+                }
             }
-            return null;
+            throw new NotFoundException("THAT BAI","TAI KHOAN BI KHOA");
         } catch (Exception e) {
             throw new RuntimeException("LOGIN_FAILURE");
         }
@@ -238,6 +245,63 @@ public class UserServiceImpl implements UserService {
             userDtoList.add(userDto);
         });
         return userDtoList;
+    }
+
+    @Override
+    public List<UserDto> searchUser(SearchUserRequestDto searchUserRequestDto) {
+        Integer age = searchUserRequestDto.getAge();
+        String gender = searchUserRequestDto.getGender();
+        Boolean isactivated = searchUserRequestDto.getIsactivated();
+        List<User> userList = new ArrayList<>();
+        if (Objects.isNull(age ) && !gender.isEmpty() && Objects.isNull(isactivated)) {
+            userList = userRepository.findBySearchGender(searchUserRequestDto.getGender().toLowerCase());
+        }
+        if (Objects.nonNull(age) && gender.isEmpty() && Objects.isNull(isactivated)  ) {
+            userList = userRepository.findBySearchAge(searchUserRequestDto.getAge());
+
+        }
+        List<UserDto> userDtoList = new ArrayList<>();
+        userList.forEach(item -> {
+            UserDto userDto = new UserDto();
+            BeanUtils.copyProperties(item, userDto);
+            userDto.setRoleName(item.getRole().getRoleName());
+            userDtoList.add(userDto);
+        });
+        return userDtoList;
+    }
+
+    @Override
+    public List<UserDto> findAllUserSearch(SearchUserRequestDto searchUserRequestDto) {
+
+        List<User> userList = userRepository.findAll(UserSpec.filter(searchUserRequestDto.getAge(), searchUserRequestDto.getGender().toLowerCase(),searchUserRequestDto.getIsactivated()));
+        List<UserDto> userDtoList = new ArrayList<>();
+        for (User user : userList) {
+            UserDto userDto = new UserDto();
+            BeanUtils.copyProperties(user, userDto);
+            userDto.setRoleName(user.getRole().getRoleName());
+            userDtoList.add(userDto);
+        }
+        return userDtoList;
+    }
+
+    @Override
+    public UserDto unActivatedUser(Long id) {
+        User user= userRepository.findById(id).orElse(null);
+        if(user == null) {
+            throw new NotFoundException(CODE.USER_EXIST,"USER_EXIST_NOT");
+        } else {
+            if (user.getIsActivated()) {
+                user.setIsActivated(false);
+            } else {
+                user.setIsActivated(true);
+            }
+        }
+        userRepository.save(user);
+
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(user, userDto);
+        userDto.setRoleName(user.getRole().getRoleName());
+        return userDto;
     }
 
 

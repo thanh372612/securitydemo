@@ -35,7 +35,7 @@ public class UserController {
         );
     }
 
-    @PostMapping("/changepass/{id}")
+    @PostMapping("/changePass/{id}")
     public ResponseEntity<ResponeObject> changePassCustomer(@RequestBody ChangePassRequetDto changePassRequetDto, @PathVariable Long id){
 
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -51,7 +51,29 @@ public class UserController {
         );
     }
 
-
-
+//    @PostMapping("/searchUser")
+//    public ResponseEntity<ResponeObject> searchUser(@RequestBody SearchUserRequestDto searchUserRequestDto)
+//    {
+//        List<UserDto> userDtoList = userService.searchUser(searchUserRequestDto);
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY_PASS, Instant.now(),userDtoList)
+//        );
+//    }
+    @PostMapping("/searchSpec")
+    public ResponseEntity<ResponeObject> searchSpects(@RequestBody SearchUserRequestDto searchUserRequestDto)
+    {
+        List<UserDto> userDtoList = userService.findAllUserSearch(searchUserRequestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY_PASS, Instant.now(),userDtoList)
+        );
+    }
+    @PostMapping("/isActiveUser/{id}")
+    public ResponseEntity<ResponeObject> updateActiveUser(@PathVariable("id") Long id)
+    {
+        UserDto userDto = userService.unActivatedUser(id);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY_PASS, Instant.now(),userDto)
+        );
+    }
 
 }

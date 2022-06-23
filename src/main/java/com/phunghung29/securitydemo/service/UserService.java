@@ -21,7 +21,12 @@ public interface UserService {
 
     List<UserDto> searchEmail (String searchEmaiRequestDto);
 
-//    List<UserDto>
+    List<UserDto> searchUser(SearchUserRequestDto searchUserRequestDto);
+
+    List<UserDto> findAllUserSearch(SearchUserRequestDto searchUserRequestDto);
+
+    UserDto unActivatedUser(Long id);
+
 
 //    ResponseEntity<ResponeObject> updateUser1(UserUpdataDto userUpdataDto, Long id);
 

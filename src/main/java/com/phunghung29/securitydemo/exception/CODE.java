@@ -22,4 +22,6 @@ public class CODE {
 
     public static String EMAIL_INCORRECT="EMAIL_INCORRECT";
     public static String PASS_ERROR="PASS_ERROR";
+
+    public static String USER_EXIST="USER_EXIST";
 }
