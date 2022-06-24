@@ -3,8 +3,10 @@ package com.phunghung29.securitydemo.config;
 import com.phunghung29.securitydemo.filter.jwt.JwtHandlerFilter;
 import com.phunghung29.securitydemo.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -58,4 +60,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+//    @Bean
+//    public MessageSource messageSource(){
+//        ReloadableResourceBundleMessageSource messageSource= new ReloadableResourceBundleMessageSource();
+//        messageSource.setBasename("classpath:i18n/message");
+//        messageSource.setDefaultEncoding("UTF-8");
+//        return messageSource;
+//    }
 }

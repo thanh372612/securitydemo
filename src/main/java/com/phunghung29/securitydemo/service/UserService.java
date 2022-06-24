@@ -26,6 +26,7 @@ public interface UserService {
     List<UserDto> findAllUserSearch(SearchUserRequestDto searchUserRequestDto);
 
     UserDto unActivatedUser(Long id);
+    String resetPass(ForgetPassRequestDto forgetPassRequestDto);
 
 
 //    ResponseEntity<ResponeObject> updateUser1(UserUpdataDto userUpdataDto, Long id);

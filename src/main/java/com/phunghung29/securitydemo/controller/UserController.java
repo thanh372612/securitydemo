@@ -76,4 +76,13 @@ public class UserController {
         );
     }
 
+    @PostMapping("/forgetPass")
+    public ResponseEntity<ResponeObject> forgetPass(@RequestBody ForgetPassRequestDto forgetPassRequestDto)
+    {
+        String userDto = userService.resetPass(forgetPassRequestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponeObject("200", CODE.UPDATE_SUCESSFFULY_PASS, Instant.now(),userDto)
+        );
+    }
+
 }

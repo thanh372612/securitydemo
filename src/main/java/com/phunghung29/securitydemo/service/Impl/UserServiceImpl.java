@@ -12,6 +12,7 @@ import com.phunghung29.securitydemo.repository.UserRepository;
 import com.phunghung29.securitydemo.service.UserService;
 import com.phunghung29.securitydemo.specs.UserSpec;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -302,6 +312,94 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, userDto);
         userDto.setRoleName(user.getRole().getRoleName());
         return userDto;
+    }
+    public static String generateRandomPassword(int len)
+
+    {
+
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        return RandomStringUtils.random(len, chars);
+
+    }
+    @Override
+    public String resetPass(ForgetPassRequestDto forgetPassRequestDto) {
+        User user2= userRepository.findByEmail(forgetPassRequestDto.getEmail());
+        if (user2==null)
+        {
+            throw new NotFoundException("Email","Email k tồn tại");
+        }
+        Random random = new Random();
+        String password = "123OmsProject";
+//        String lowerCharacter = "abcdefH";
+//        String UpperCharacter= "ABCDEFH";
+//        String number= "123456";
+//        String concatString = lowerCharacter + UpperCharacter + number;
+//        int number1 = concatString.length();
+//        Char[] pass= new Char[number1];
+//                password(random.nextInt(password.length()));
+
+        String resetpass= String.valueOf(password);
+        log.info("messge {}",resetpass);
+        Long id= user2.getId();
+//        AtomicReference<UserDto> userDto = new AtomicReference<>(new UserDto());
+        userRepository.findById(id)
+                .map(user -> {
+                    String resetpass1= passwordEncoder.encode(resetpass);
+                    user.setPassword(resetpass1);
+                    userRepository.save(user);
+//                    userDto.set(new UserDto(id, user.getEmail(), user.getAge(), user.getGender(), user.getIsActivated(), user.getRole().getRoleName()));
+//
+                   return resetpass;
+                }).orElseThrow(() ->  new IllegalArgumentException("User Not Found"));
+//                .orElseGet(() -> {
+//                    User user1 = new User();
+//                    user1.setId(id);
+//                    user1.setEmail(forgetPassRequestDto.getEmail());
+////                    userDto.set(new UserDto(id, user1.getEmail(), user1.getAge(), user1.getGender(), user1.getIsActivated(), user1.getRole().getRoleName()));
+//                    userRepository.save(user1);
+//                    return resetpass;
+//                });
+        return resetpass;
+
+    }
+    public void sendEmail(String emailuser, String passnew)
+    {
+        final String fromEmail = "dtpthanh_19th2@student.agu.edu.vn";
+        // Mat khai email cua ban
+        final String password = "phuongth@nh37";
+        // dia chi email nguoi nhan
+        final String toEmail = emailuser;
+
+        final String subject = "Pass New";
+        final String body = passnew;
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com"); //SMTP Host
+        props.put("mail.smtp.port", "587"); //TLS Port
+        props.put("mail.smtp.auth", "true"); //enable authentication
+        props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
+
+//        Authenticator auth = new Authenticator() {
+//            protected PasswordAuthentication getPasswordAuthentication() {
+//                return new PasswordAuthentication(fromEmail, password);
+//            }
+//        };
+//        Session session = Session.getInstance(props, auth);
+//        MimeMessage msg = new MimeMessage(session);
+//        //set message headers
+//        msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+//        msg.addHeader("format", "flowed");
+//        msg.addHeader("Content-Transfer-Encoding", "8bit");
+//        msg.setFrom(new InternetAddress(fromEmail, "NoReply-JD"));
+//        msg.setReplyTo(InternetAddress.parse(fromEmail, false));
+//        msg.setSubject(subject, "UTF-8");
+//        msg.setText(body, "UTF-8");
+//        msg.setSentDate(new Date());
+//        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
+//        Transport.send(msg);
+//        System.out.println("Gui mail thanh cong");
+
     }
 
 
