@@ -9,11 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    Long id;
-    String email;
-    Integer age;
-    String gender;
-    Boolean isActivated;
-    String roleName;
+public class ChangePassRequetDto {
+    private Long id;
+    private String email;
+    private String pass_ord;
+    private String pass_new;
 }

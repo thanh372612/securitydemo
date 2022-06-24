@@ -9,11 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    Long id;
-    String email;
-    Integer age;
-    String gender;
-    Boolean isActivated;
-    String roleName;
+public class SearchEmaiRequestDto {
+    private String email;
+
 }

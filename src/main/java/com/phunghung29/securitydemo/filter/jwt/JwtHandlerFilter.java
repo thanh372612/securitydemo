@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -34,8 +35,7 @@ public class JwtHandlerFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = request.getHeader("Authorization");// lấy token từ header
-        // sử dụng thư viện verify token (kiểm tra token có dùng format? còn hạn hay hết hạn?)
+        String token = request.getHeader("Authorization");
         assert token.startsWith("Bearer");
         token = token.split(" ")[1];
         try {
@@ -48,15 +48,20 @@ public class JwtHandlerFilter extends OncePerRequestFilter {
             Map<String, Claim> tokenClaims = decodedJWT.getClaims();
             assert tokenClaims != null;
             String email = tokenClaims.get("sub").asString();
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email); // kiểm tra user đó có tồn tại trong db hay không
-            //và sẽ lấy những thông tin cần lấy(role) sau đó là lưu vào context holder
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     userDetails, userDetails.getPassword(), userDetails.getAuthorities()
             );
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             filterChain.doFilter(request, response);
         } catch (TokenExpiredException | JWTDecodeException e) {
-            throw new RuntimeException(e.getMessage());
+//            throw new RuntimeException(e.getMessage());
+            response.setStatus(400);
+            response.setContentType("application/json");
+            Map<String, String> message = new HashMap<>();
+            message.put("errorCode", "400-TOKEN");
+            message.put("message", e.getMessage());
+            response.getWriter().write(String.valueOf(message));
         }
     }
 }

@@ -1,0 +1,17 @@
+[ {
+  "uuid": "123f-1321a-3213d-1232b",
+  "error": {
+    "errorCode": "400-MISSING FIELD",
+    "message": "EMAIL IS MISSING"
+  },
+  "timestamp": "131312414143213",
+  "statusCode": "400"
+}, {
+  "uuid": "123f-1321a-3213d-1232b",
+  "data": {
+
+    "message": ""
+  },
+  "timestamp": "131312414143213",
+  "statusCode": "400"
+} ]

@@ -9,11 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    Long id;
-    String email;
+public class SearchUserRequestDto {
     Integer age;
     String gender;
-    Boolean isActivated;
-    String roleName;
+    Boolean isactivated;
 }

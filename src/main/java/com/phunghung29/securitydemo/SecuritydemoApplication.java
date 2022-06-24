@@ -25,10 +25,14 @@ public class SecuritydemoApplication {
 			roleRepo.save(admin);
 			roleRepo.save(customer);
 
-			userRepository.save(new User(1L, "email1@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", admin));
-			userRepository.save(new User(2L, "email2@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", admin));
-			userRepository.save(new User(3L, "email3@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", customer));
-			userRepository.save(new User(4L, "email4@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", customer));
+			userRepository.save(new User(1L, "email1@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 18, "Male", true, admin));
+			userRepository.save(new User(2L, "email2@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 20, "Female", true, admin));
+			userRepository.save(new User(3L, "email3@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 17, "Unknown", true, customer));
+			userRepository.save(new User(4L, "email4@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 21, "Female", false, customer));
+			userRepository.save(new User(5L, "email5@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 16, "Male", false, customer));
+			userRepository.save(new User(6L, "email6@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 25, "Male", true, customer));
+			userRepository.save(new User(7L, "email7@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 25, "Male", true, customer));
+			userRepository.save(new User(8L, "emailBstar8@gmail.com", "$2y$10$WR/cKrRYTaoJhyeE.OK5T.4qCMv1NVm4k1AQ4PmahqKsvLf4j.rea", 25, "Male", false, customer));
 		};
 	}
 }
